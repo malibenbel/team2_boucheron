@@ -5,3 +5,4 @@ from dotenv import load_dotenv
 GOOGLE_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS") 
 PROJECT_ID = os.getenv("PROJECT_ID")
 DATASET_ID = os.getenv("DATASET_ID")
+CURRENCY_API = os.getenv("CURRENCY_API_KEY")
