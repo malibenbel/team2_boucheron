@@ -18,7 +18,20 @@ def get_exchange_rates():
         return None
 
 
+"""
 # Function to convert prices
 def convert_to_eur(currency_col, price_col):
     exchange_rates = get_exchange_rates()
-    return price_col.where(currency_col == "EUR", price_col / currency_col.map(exchange_rates))
+    return price_col.where(
+        currency_col == "EUR", price_col / currency_col.map(exchange_rates)
+    )
+"""
+
+
+def convert_to_eur(currency_col, price_col):
+    # Convert price_col to float to allow float arithmetic
+    price_col = price_col.astype(float)
+    exchange_rates = get_exchange_rates()
+    return price_col.where(
+        currency_col == "EUR", price_col / currency_col.map(exchange_rates)
+    )
