@@ -1,0 +1,10 @@
+google-cloud-bigquery
+pandas
+matplotlib
+seaborn
+scikit-learn
+python-dotenv
+numpy
+requests
+selenium
+webdriver_manager
