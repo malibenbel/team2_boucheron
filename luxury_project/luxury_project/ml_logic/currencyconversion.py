@@ -18,17 +18,7 @@ def get_exchange_rates():
         return None
 
 
-# Fetch exchange rates
-exchange_rates = get_exchange_rates()
-
-
 # Function to convert prices
-def convert_to_eur(df):
-    converted = []
-    for row in df.iterrows():
-        currency = row["currency"]
-        price = row["price"]
-
-        if currency in exchange_rates:
-            converted.append(price / exchange_rates[currency])
-    df["price_eur"] = converted
+def convert_to_eur(currency_col, price_col):
+    exchange_rates = get_exchange_rates()
+    return price_col.where(currency_col == "EUR", price_col / currency_col.map(exchange_rates))
