@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables load_dotenv()
-GOOGLE_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS") 
+GOOGLE_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 PROJECT_ID = os.getenv("PROJECT_ID")
 PRICE_DATASET_ID = os.getenv("PRICE_DATASET_ID")
 SALES_DATASET_ID = os.getenv("SALES_DATASET_ID")
