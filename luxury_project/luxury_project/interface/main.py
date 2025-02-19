@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
+from statsmodels.tsa.arima.model import ARIMA
 import pandas as pd
 
 # Load the data
@@ -43,39 +44,51 @@ save_data(df_stock, "Stock")
 if __name__ == "__main__":
     boucheron_recommender()
 
-"""
-#### Part 2 - model training
+stock_data = get_stock_data("KER.PA")
 
-# 1. Check for non-numeric values in the prices_EUR column
-non_numeric_prices = df_price[
-    ~df_price["prices_EUR"].apply(lambda x: isinstance(x, (int, float)))
-]
-print("Non-numeric price values found:")
-print(non_numeric_prices)
+# --- Select the Adjusted Close price series ---
+if "Adj Close" in stock_data.columns:
+    ts = stock_data["Adj Close"]
+else:
+    ts = stock_data["Close"]
 
-# 2. Convert prices_EUR to numeric (non-convertible values become NaN)
-df_price["prices_EUR"] = pd.to_numeric(df_price["prices_EUR"], errors="coerce")
+ts = ts.sort_index()
 
-# Optional: Drop rows where prices_EUR is NaN after conversion
-df_price = df_price.dropna(subset=["prices_EUR"])
+# --- Check the Data ---
+print("Data Description:")
+print(ts.describe())
+print("\nFirst few rows:")
+print(ts.head())
+print("\nLast few rows:")
+print(ts.tail())
 
-# 3. Prepare features and target variable
-# One-hot encode the categorical columns ("collection" and "currency")
-X = pd.get_dummies(df_price[["collection", "currency"]])
-y = df_price["prices_EUR"]
+# Drop any remaining missing values
+ts = ts.dropna()
 
-# 4. Split the data into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+# --- Fit an ARIMA(1,1,1) Model ---
+try:
+    model = ARIMA(ts, order=(1, 1, 1))
+    model_fit = model.fit()
+    print(model_fit.summary())
+except Exception as e:
+    print("Error fitting ARIMA model:", e)
+    raise
 
-# 5. Train the KNeighborsRegressor model
-model = KNeighborsRegressor(n_neighbors=5)
-model.fit(X_train, y_train)
+# --- Forecast the Next 5 Trading Days ---
+forecast_steps = 5
+try:
+    forecast = model_fit.forecast(steps=forecast_steps)
+except Exception as e:
+    print("Error during forecasting:", e)
+    raise
 
-# 6. Evaluate the model on the test set
-y_pred = model.predict(X_test)
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
+# If forecast index isn't date-based, create a new date range using business days
+if not isinstance(forecast.index, pd.DatetimeIndex):
+    last_date = ts.index[-1]
+    forecast_index = pd.date_range(
+        start=last_date + pd.Timedelta(days=1), periods=forecast_steps, freq="B"
+    )
+    forecast = pd.Series(forecast, index=forecast_index)
 
-print(f"📊 Mean Squared Error: {mse:.4f}")
-print(f"📈 R-squared: {r2:.4f}")
-"""
+print("\nForecast for the next 5 trading days:")
+print(forecast)

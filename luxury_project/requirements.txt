@@ -9,3 +9,5 @@ requests
 selenium
 webdriver_manager
 yfinance
+statsmodels
+streamlit
