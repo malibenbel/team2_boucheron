@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
+from statsmodels.tsa.arima.model import ARIMA
 import pandas as pd
 
 # Load the data
@@ -38,39 +39,19 @@ save_data(df_price, "PriceEUR")
 save_data(df_scraped, "Scraped")
 save_data(df_stock, "Stock")
 
-"""
-#### Part 2 - model training
+ts = df_sales["number_of_items_sold"]
 
-# 1. Check for non-numeric values in the prices_EUR column
-non_numeric_prices = df_price[
-    ~df_price["prices_EUR"].apply(lambda x: isinstance(x, (int, float)))
-]
-print("Non-numeric price values found:")
-print(non_numeric_prices)
+# --- Fit a Simple ARIMA Model ---
+# The order (1,1,1) is just a starting point; further tuning may be required.
+model = ARIMA(ts, order=(1, 1, 1))
+model_fit = model.fit()
 
-# 2. Convert prices_EUR to numeric (non-convertible values become NaN)
-df_price["prices_EUR"] = pd.to_numeric(df_price["prices_EUR"], errors="coerce")
+# Print the model summary
+print(model_fit.summary())
 
-# Optional: Drop rows where prices_EUR is NaN after conversion
-df_price = df_price.dropna(subset=["prices_EUR"])
-
-# 3. Prepare features and target variable
-# One-hot encode the categorical columns ("collection" and "currency")
-X = pd.get_dummies(df_price[["collection", "currency"]])
-y = df_price["prices_EUR"]
-
-# 4. Split the data into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-
-# 5. Train the KNeighborsRegressor model
-model = KNeighborsRegressor(n_neighbors=5)
-model.fit(X_train, y_train)
-
-# 6. Evaluate the model on the test set
-y_pred = model.predict(X_test)
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
-
-print(f"📊 Mean Squared Error: {mse:.4f}")
-print(f"📈 R-squared: {r2:.4f}")
-"""
+# --- Forecast Future Quantity ---
+# Forecast the next 12 time periods (e.g., months, days, depending on your frequency)
+forecast_steps = 12
+forecast = model_fit.forecast(steps=forecast_steps)
+print("Forecast for the next", forecast_steps, "periods:")
+print(forecast)

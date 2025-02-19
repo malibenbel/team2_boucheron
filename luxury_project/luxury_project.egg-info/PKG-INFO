@@ -13,5 +13,6 @@ Requires-Dist: requests
 Requires-Dist: selenium
 Requires-Dist: webdriver_manager
 Requires-Dist: yfinance
+Requires-Dist: statsmodels
 Dynamic: requires-dist
 Dynamic: summary
