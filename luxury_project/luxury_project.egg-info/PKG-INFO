@@ -12,5 +12,6 @@ Requires-Dist: numpy
 Requires-Dist: requests
 Requires-Dist: selenium
 Requires-Dist: webdriver_manager
+Requires-Dist: yfinance
 Dynamic: requires-dist
 Dynamic: summary

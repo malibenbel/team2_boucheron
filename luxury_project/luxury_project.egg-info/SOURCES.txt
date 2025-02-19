@@ -16,3 +16,4 @@ luxury_project/ml_logic/currencyconversion.py
 luxury_project/ml_logic/data.py
 luxury_project/ml_logic/registry.py
 luxury_project/ml_logic/scraper.py
+luxury_project/ml_logic/stock.py
