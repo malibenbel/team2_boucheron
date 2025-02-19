@@ -33,5 +33,5 @@ def convert_to_eur(currency_col, price_col):
     price_col = price_col.astype(float)
     exchange_rates = get_exchange_rates()
     return price_col.where(
-        currency_col == "EUR", price_col / currency_col.map(exchange_rates)
+        currency_col == "EUR", price_col * currency_col.map(exchange_rates)
     )

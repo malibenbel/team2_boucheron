@@ -1,15 +1,17 @@
 import streamlit as st
 import pandas as pd
+
+
 def boucheron_recommender(df):
     # Load dataset
-    #file_path = "PM_extract_Jan_2025_10_brands.csv"
-    #df = pd.read_csv(file_path, sep=';')
+    # file_path = "PM_extract_Jan_2025_10_brands.csv"
+    # df = pd.read_csv(file_path, sep=';')
 
     # Keep only Boucheron brand
-    df = df[df['brand'] == 'Boucheron']
+    df = df[df["brand"] == "Boucheron"]
 
     # Convert price to numeric (in case of errors)
-    df["price"] = pd.to_numeric(df["price"], errors='coerce')
+    df["price"] = pd.to_numeric(df["price"], errors="coerce")
 
     # Streamlit App Title
     st.title("⌚ Boucheron Watch Recommender")
@@ -19,13 +21,14 @@ def boucheron_recommender(df):
 
     # User selects a price range
     min_price, max_price = st.sidebar.slider(
-        "Select Price Range (in original currency)", 
-        int(df["price"].min()), int(df["price"].max()), 
-        (int(df["price"].min()), int(df["price"].max()))
+        "Select Price Range (in original currency)",
+        int(df["price"].min()),
+        int(df["price"].max()),
+        (int(df["price"].min()), int(df["price"].max())),
     )
 
     # User selects a country
-    country_options = df["country"].unique()    
+    country_options = df["country"].unique()
     selected_country = st.sidebar.selectbox("Select Country", country_options)
 
     # User selects a currency
@@ -41,11 +44,11 @@ def boucheron_recommender(df):
 
     # Filter dataset based on selections
     filtered_df = df[
-        (df["price"] >= min_price) & 
-        (df["price"] <= max_price) & 
-        (df["country"] == selected_country) & 
-        (df["currency"] == selected_currency) & 
-        (df["collection"] == selected_collection)
+        (df["price"] >= min_price)
+        & (df["price"] <= max_price)
+        & (df["country"] == selected_country)
+        & (df["currency"] == selected_currency)
+        & (df["collection"] == selected_collection)
     ]
 
     # Display results
@@ -53,16 +56,18 @@ def boucheron_recommender(df):
     if not filtered_df.empty:
         for i, row in filtered_df.head(num_recommendations).iterrows():
             st.markdown(f"""
-            **{row['reference_code']}**  
-            💰 **Price:** {row['price']} {row['currency']}  
-            🌍 **Country:** {row['country']}  
-            🔗 [View Watch]({row['url']})  
+            **{row["reference_code"]}**  
+            💰 **Price:** {row["price"]} {row["currency"]}  
+            🌍 **Country:** {row["country"]}  
+            🔗 [View Watch]({row["url"]})  
             """)
     else:
-        st.warning("No watches found for the selected filters. Try adjusting the price range, country, or collection.")
+        st.warning(
+            "No watches found for the selected filters. Try adjusting the price range, country, or collection."
+        )
 
     # Footer
     st.markdown("🔍 *Refine your search on the sidebar!*")
-    
+
     return None
-    # python -m streamlit run boucheron_recommender.p
+    # python -m streamlit run boucheron_recommender.py

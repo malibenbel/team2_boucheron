@@ -18,7 +18,9 @@ import pandas as pd
 # Load the data
 df_sales = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Sales`")
 df_price = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Price`")
-df_recommendations = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.recom`")
+df_recommendations = load_data(
+    "SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.recom`"
+)
 df_price["price"] = pd.to_numeric(df_price["price"], errors="coerce")
 df_scraped = web_scraper()
 df_stock = get_stock_data()
@@ -44,6 +46,7 @@ save_data(df_stock, "Stock")
 if __name__ == "__main__":
     boucheron_recommender()
 
+"""
 stock_data = get_stock_data("KER.PA")
 
 # --- Select the Adjusted Close price series ---
@@ -92,3 +95,4 @@ if not isinstance(forecast.index, pd.DatetimeIndex):
 
 print("\nForecast for the next 5 trading days:")
 print(forecast)
+"""
