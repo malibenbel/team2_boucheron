@@ -12,23 +12,28 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 import pandas as pd
 
+# Load the data
 df_sales = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Sales`")
 df_price = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Price`")
+df_price["price"] = pd.to_numeric(df_price["price"], errors="coerce")
 df_scraped = web_scraper()
 
+# Clean the data
 df_price = clean_df(df_price)
 df_sales = clean_df(df_sales)
 df_scraped = clean_df(df_scraped)
 
-df_price["price"] = pd.to_numeric(df_price["price"], errors="coerce")
 
-df_sales["total_sales_EUR"] = convert_to_eur(
-    df_sales["currency"], df_sales["total_sales"]
-)
+
+#### Part 1 - tables exporting
+
+df_sales["total_sales_EUR"] = convert_to_eur(df_sales["currency"], df_sales["total_sales"])
 df_price["prices_EUR"] = convert_to_eur(df_price["currency"], df_price["price"])
 
 save_data(df_sales, "SalesEUR")
 save_data(df_price, "PriceEUR")
+
+#### Part 2 - model training
 
 # Check for non-numeric values in the prices_EUR column
 non_numeric_prices = df_price[
@@ -39,8 +44,6 @@ print(non_numeric_prices)
 # Convert prices_EUR to numeric, forcing errors to NaN
 df_price["prices_EUR"] = pd.to_numeric(df_price["prices_EUR"], errors="coerce")
 
-# Drop rows with NaN values in prices_EUR
-df_price = df_price.dropna(subset=["prices_EUR"])
 
 # Proceed with the rest of your code
 X = pd.get_dummies(df_price[["collection", "currency"]])
