@@ -3,6 +3,7 @@ from luxury_project.ml_logic.currencyconversion import convert_to_eur
 from luxury_project.ml_logic.registry import save_data
 from luxury_project.ml_logic.clean import clean_df
 from luxury_project.ml_logic.scraper import web_scraper
+from luxury_project.ml_logic.stock import get_stock
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
@@ -17,13 +18,13 @@ df_sales = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.S
 df_price = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Price`")
 df_price["price"] = pd.to_numeric(df_price["price"], errors="coerce")
 df_scraped = web_scraper()
+df_stock = get_stock()
 
 # Clean the data
 df_price = clean_df(df_price)
 df_sales = clean_df(df_sales)
 df_scraped = clean_df(df_scraped)
-
-
+df_stock = clean_df(df_stock)
 
 #### Part 1 - tables exporting
 
@@ -32,6 +33,8 @@ df_price["prices_EUR"] = convert_to_eur(df_price["currency"], df_price["price"])
 
 save_data(df_sales, "SalesEUR")
 save_data(df_price, "PriceEUR")
+save_data(df_scraped, "Scraped")
+save_data(df_stock, "Stock")
 
 #### Part 2 - model training
 
