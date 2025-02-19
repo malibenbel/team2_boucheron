@@ -5,94 +5,109 @@ from luxury_project.ml_logic.clean import clean_df
 from luxury_project.ml_logic.scraper import web_scraper
 from luxury_project.ml_logic.stock import get_stock_data
 from luxury_project.ml_logic.boucheron_recommender import boucheron_recommender
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
 from statsmodels.tsa.arima.model import ARIMA
 import pandas as pd
 
-# Load the data
-df_sales = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Sales`")
-df_price = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Price`")
-df_recommendations = load_data(
-    "SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.recom`"
-)
-df_price["price"] = pd.to_numeric(df_price["price"], errors="coerce")
-df_scraped = web_scraper()
-df_stock = get_stock_data()
 
-# Clean the data
-df_price = clean_df(df_price)
-df_sales = clean_df(df_sales)
-df_scraped = clean_df(df_scraped)
-df_stock = clean_df(df_stock)
+def data_loading():
+    # Load the data
+    df_sales = load_data(
+        "SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Sales`"
+    )
+    df_price = load_data(
+        "SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Price`"
+    )
+    df_price["price"] = pd.to_numeric(df_price["price"], errors="coerce")
+    df_stock = get_stock_data()
+    return df_sales, df_price, df_stock
 
-#### Part 1 - tables exporting
 
-df_sales["total_sales_EUR"] = convert_to_eur(
-    df_sales["currency"], df_sales["total_sales"]
-)
-df_price["prices_EUR"] = convert_to_eur(df_price["currency"], df_price["price"])
+def scraping():
+    df_scraped = web_scraper()
+    return df_scraped
 
-save_data(df_sales, "SalesEUR")
-save_data(df_price, "PriceEUR")
-save_data(df_scraped, "Scraped")
-save_data(df_stock, "Stock")
-# ✅ Call the function when running the script
-if __name__ == "__main__":
+
+def preprocess(df_sales, df_price, df_scraped, df_stock):
+    """
+    Clean the data and save the processed versions.
+    """
+    # Clean the data
+    df_price = clean_df(df_price)
+    df_sales = clean_df(df_sales)
+    df_scraped = clean_df(df_scraped)
+    df_stock = clean_df(df_stock)
+
+    # Save processed data
+    save_data(df_sales, "SalesEUR")
+    save_data(df_price, "PriceEUR")
+    save_data(df_scraped, "Scraped")
+    save_data(df_stock, "Stock")
+
+    print("Preprocessing complete.")
+    return df_sales, df_price, df_scraped, df_stock
+
+
+def eur_conversion(df_sales, df_price):
+    # Convert currency values to EUR
+    df_sales["total_sales_EUR"] = convert_to_eur(
+        df_sales["currency"], df_sales["total_sales"]
+    )
+    df_price["prices_EUR"] = convert_to_eur(df_price["currency"], df_price["price"])
+    print("EUR conversion complete.")
+    return df_sales, df_price
+
+
+def streamlit():
+    """
+    Run the Boucheron recommender.
+    """
+    print("Starting recommender (training step)...")
     boucheron_recommender()
+    print("Training complete.")
 
-"""
-stock_data = get_stock_data("KER.PA")
 
-# --- Select the Adjusted Close price series ---
-if "Adj Close" in stock_data.columns:
-    ts = stock_data["Adj Close"]
-else:
-    ts = stock_data["Close"]
+def train_test():
+    """
+    Train an ARIMA model on stock data and print a 10-day forecast.
+    """
+    print("Testing ARIMA model forecast...")
+    df = get_stock_data("KER.PA")
+    ts = df["Close"].dropna()
+    ts = ts.asfreq("B").fillna(method="ffill")
 
-ts = ts.sort_index()
-
-# --- Check the Data ---
-print("Data Description:")
-print(ts.describe())
-print("\nFirst few rows:")
-print(ts.head())
-print("\nLast few rows:")
-print(ts.tail())
-
-# Drop any remaining missing values
-ts = ts.dropna()
-
-# --- Fit an ARIMA(1,1,1) Model ---
-try:
     model = ARIMA(ts, order=(1, 1, 1))
     model_fit = model.fit()
     print(model_fit.summary())
-except Exception as e:
-    print("Error fitting ARIMA model:", e)
-    raise
 
-# --- Forecast the Next 5 Trading Days ---
-forecast_steps = 5
-try:
+    forecast_steps = 10
     forecast = model_fit.forecast(steps=forecast_steps)
-except Exception as e:
-    print("Error during forecasting:", e)
-    raise
 
-# If forecast index isn't date-based, create a new date range using business days
-if not isinstance(forecast.index, pd.DatetimeIndex):
-    last_date = ts.index[-1]
-    forecast_index = pd.date_range(
-        start=last_date + pd.Timedelta(days=1), periods=forecast_steps, freq="B"
+    # Create a proper DatetimeIndex if needed
+    if not isinstance(forecast.index, pd.DatetimeIndex):
+        last_date = ts.index[-1]
+        forecast_index = pd.date_range(
+            start=last_date + pd.Timedelta(days=1), periods=forecast_steps, freq="B"
+        )
+        forecast = pd.Series(forecast, index=forecast_index)
+
+    print("\nForecast for the next 10 trading days:")
+    print(forecast)
+    print("Testing complete.")
+
+
+def main():
+    """
+    Run all steps in sequence.
+    """
+    df_sales, df_price, df_stock = data_loading()
+    df_scraped = scraping()
+    df_sales, df_price, df_scraped, df_stock = preprocess(
+        df_sales, df_price, df_scraped, df_stock
     )
-    forecast = pd.Series(forecast, index=forecast_index)
+    df_sales, df_price = eur_conversion(df_sales, df_price)
+    streamlit()
+    train_test()
 
-print("\nForecast for the next 5 trading days:")
-print(forecast)
-"""
+
+if __name__ == "__main__":
+    main()
