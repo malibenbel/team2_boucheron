@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
-def boucheron_recommender():
+def boucheron_recommender(df):
     # Load dataset
-    file_path = "PM_extract_Jan_2025_10_brands.csv"
-    df = pd.read_csv(file_path, sep=';')
+    #file_path = "PM_extract_Jan_2025_10_brands.csv"
+    #df = pd.read_csv(file_path, sep=';')
 
     # Keep only Boucheron brand
     df = df[df['brand'] == 'Boucheron']

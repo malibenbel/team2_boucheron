@@ -4,6 +4,7 @@ from luxury_project.ml_logic.registry import save_data
 from luxury_project.ml_logic.clean import clean_df
 from luxury_project.ml_logic.scraper import web_scraper
 from luxury_project.ml_logic.stock import get_stock_data
+from luxury_project.ml_logic.boucheron_recommender import boucheron_recommender
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
@@ -16,6 +17,7 @@ import pandas as pd
 # Load the data
 df_sales = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Sales`")
 df_price = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Price`")
+df_recommendations = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.recom`")
 df_price["price"] = pd.to_numeric(df_price["price"], errors="coerce")
 df_scraped = web_scraper()
 df_stock = get_stock_data()
@@ -37,6 +39,9 @@ save_data(df_sales, "SalesEUR")
 save_data(df_price, "PriceEUR")
 save_data(df_scraped, "Scraped")
 save_data(df_stock, "Stock")
+# ✅ Call the function when running the script
+if __name__ == "__main__":
+    boucheron_recommender()
 
 """
 #### Part 2 - model training
