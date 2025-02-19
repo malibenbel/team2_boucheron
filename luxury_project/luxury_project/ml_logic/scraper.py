@@ -19,49 +19,49 @@ driver = webdriver.Chrome(
 
 # Store extracted data
 all_watches = []
+def web_scraper():
+    # Start scraping from page 1 and continue
+    page = 1
+    while True:
+        if page == 1:
+            url = "https://www.boucheron.com/fr_fr/horlogerie/toute-l-horlogerie.html"  # First page URL
+        else:
+            url = f"https://www.boucheron.com/fr_fr/horlogerie/toute-l-horlogerie.html?p={page}"  # Next pages
 
-# Start scraping from page 1 and continue
-page = 1
-while True:
-    if page == 1:
-        url = "https://www.boucheron.com/fr_fr/horlogerie/toute-l-horlogerie.html"  # First page URL
-    else:
-        url = f"https://www.boucheron.com/fr_fr/horlogerie/toute-l-horlogerie.html?p={page}"  # Next pages
+        print(f"🔄 Scraping Page {page}... [{url}]")
+        driver.get(url)
+        time.sleep(5)  # Wait for JavaScript to load
 
-    print(f"🔄 Scraping Page {page}... [{url}]")
-    driver.get(url)
-    time.sleep(5)  # Wait for JavaScript to load
+        # Find all product containers
+        products = driver.find_elements(By.CLASS_NAME, "product-item")
 
-    # Find all product containers
-    products = driver.find_elements(By.CLASS_NAME, "product-item")
+        if not products:  # If no products are found, stop the loop
+            print(f"No more products found on page {page}. Stopping.")
+            break
 
-    if not products:  # If no products are found, stop the loop
-        print(f"No more products found on page {page}. Stopping.")
-        break
+        for product in products:
+            try:
+                # Extract reference code
+                ref_code = (
+                    product.find_element(By.XPATH, ".//span[contains(text(), 'ref')]")
+                    .text.replace("ref • ", "")
+                    .strip()
+                )
+            except:
+                ref_code = "N/A"
 
-    for product in products:
-        try:
-            # Extract reference code
-            ref_code = (
-                product.find_element(By.XPATH, ".//span[contains(text(), 'ref')]")
-                .text.replace("ref • ", "")
-                .strip()
-            )
-        except:
-            ref_code = "N/A"
+            try:
+                # Extract price
+                price = product.find_element(By.CLASS_NAME, "price").text.strip()
+            except:
+                price = "N/A"
 
-        try:
-            # Extract price
-            price = product.find_element(By.CLASS_NAME, "price").text.strip()
-        except:
-            price = "N/A"
+            # Store in list
+            all_watches.append({"Reference Code": ref_code, "Price": price})
 
-        # Store in list
-        all_watches.append({"Reference Code": ref_code, "Price": price})
+        print(f"Page {page} scraped successfully.")
+        page += 1  # Move to the next page
 
-    print(f"Page {page} scraped successfully.")
-    page += 1  # Move to the next page
-
-df_scraped = pd.DataFrame(all_watches)
-driver.quit()
-print(df_scraped.head())
+    df_scraped = pd.DataFrame(all_watches)
+    driver.quit()
+    return df_scraped
