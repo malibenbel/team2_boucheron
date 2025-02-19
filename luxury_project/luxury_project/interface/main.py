@@ -39,19 +39,51 @@ save_data(df_price, "PriceEUR")
 save_data(df_scraped, "Scraped")
 save_data(df_stock, "Stock")
 
-ts = df_sales["number_of_items_sold"]
+stock_data = get_stock_data("KER.PA")
 
-# --- Fit a Simple ARIMA Model ---
-# The order (1,1,1) is just a starting point; further tuning may be required.
-model = ARIMA(ts, order=(1, 1, 1))
-model_fit = model.fit()
+# --- Select the Adjusted Close price series ---
+if "Adj Close" in stock_data.columns:
+    ts = stock_data["Adj Close"]
+else:
+    ts = stock_data["Close"]
 
-# Print the model summary
-print(model_fit.summary())
+ts = ts.sort_index()
 
-# --- Forecast Future Quantity ---
-# Forecast the next 12 time periods (e.g., months, days, depending on your frequency)
-forecast_steps = 12
-forecast = model_fit.forecast(steps=forecast_steps)
-print("Forecast for the next", forecast_steps, "periods:")
+# --- Check the Data ---
+print("Data Description:")
+print(ts.describe())
+print("\nFirst few rows:")
+print(ts.head())
+print("\nLast few rows:")
+print(ts.tail())
+
+# Drop any remaining missing values
+ts = ts.dropna()
+
+# --- Fit an ARIMA(1,1,1) Model ---
+try:
+    model = ARIMA(ts, order=(1, 1, 1))
+    model_fit = model.fit()
+    print(model_fit.summary())
+except Exception as e:
+    print("Error fitting ARIMA model:", e)
+    raise
+
+# --- Forecast the Next 5 Trading Days ---
+forecast_steps = 5
+try:
+    forecast = model_fit.forecast(steps=forecast_steps)
+except Exception as e:
+    print("Error during forecasting:", e)
+    raise
+
+# If forecast index isn't date-based, create a new date range using business days
+if not isinstance(forecast.index, pd.DatetimeIndex):
+    last_date = ts.index[-1]
+    forecast_index = pd.date_range(
+        start=last_date + pd.Timedelta(days=1), periods=forecast_steps, freq="B"
+    )
+    forecast = pd.Series(forecast, index=forecast_index)
+
+print("\nForecast for the next 5 trading days:")
 print(forecast)

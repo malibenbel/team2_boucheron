@@ -11,6 +11,7 @@ luxury_project/interface/__init__.py
 luxury_project/interface/main.py
 luxury_project/interface/main_local.py
 luxury_project/ml_logic/__init__.py
+luxury_project/ml_logic/boucheron_recommender.py
 luxury_project/ml_logic/clean.py
 luxury_project/ml_logic/currencyconversion.py
 luxury_project/ml_logic/data.py
