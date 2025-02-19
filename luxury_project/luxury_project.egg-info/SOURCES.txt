@@ -2,7 +2,6 @@
 .envrc
 .gitignore
 Makefile
-git
 requirements.txt
 setup.py
 luxury_project/__init__.py
@@ -13,8 +12,6 @@ luxury_project.egg-info/SOURCES.txt
 luxury_project.egg-info/dependency_links.txt
 luxury_project.egg-info/requires.txt
 luxury_project.egg-info/top_level.txt
-luxury_project/__pycache__/__init__.cpython-311.pyc
-luxury_project/__pycache__/params.cpython-311.pyc
 luxury_project/interface/__init__.py
 luxury_project/interface/main.py
 luxury_project/interface/main_local.py
@@ -38,4 +35,3 @@ luxury_project/ml_logic/__pycache__/data.cpython-39.pyc
 luxury_project/ml_logic/__pycache__/registry.cpython-311.pyc
 luxury_project/ml_logic/__pycache__/scraper.cpython-311.pyc
 luxury_project/ml_logic/__pycache__/stock.cpython-311.pyc
-notebooks/notebook.ipynb
