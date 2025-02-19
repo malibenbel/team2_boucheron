@@ -4,7 +4,6 @@ from luxury_project.ml_logic.registry import save_data
 from luxury_project.ml_logic.clean import clean_df
 from luxury_project.ml_logic.scraper import web_scraper
 from luxury_project.ml_logic.stock import get_stock_data
-from luxury_project.ml_logic.boucheron_recommender import boucheron_recommender
 from statsmodels.tsa.arima.model import ARIMA
 import pandas as pd
 
@@ -57,15 +56,6 @@ def eur_conversion(df_sales, df_price):
     return df_sales, df_price
 
 
-def streamlit():
-    """
-    Run the Boucheron recommender.
-    """
-    print("Starting recommender (training step)...")
-    boucheron_recommender()
-    return None
-
-
 def train_test():
     """
     Train an ARIMA model on stock data and print a 10-day forecast.
@@ -105,7 +95,6 @@ def main():
         df_sales, df_price, df_scraped, df_stock
     )
     df_sales, df_price = eur_conversion(df_sales, df_price)
-    streamlit()
     train_test()
 
 
