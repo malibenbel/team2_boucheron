@@ -11,3 +11,5 @@ webdriver_manager
 yfinance
 statsmodels
 streamlit
+db-dtypes
+pandas-gbq

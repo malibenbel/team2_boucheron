@@ -1,7 +1,9 @@
 Metadata-Version: 2.2
 Name: luxury_project
-Version: 0.0.0
-Summary: package description
+Version: 1.0.0
+Summary: Luxury-project for Boucheron
+Author: Team2
+Author-email: gianluca.filesi@edhec.com
 Requires-Dist: google-cloud-bigquery
 Requires-Dist: pandas
 Requires-Dist: matplotlib
@@ -15,5 +17,9 @@ Requires-Dist: webdriver_manager
 Requires-Dist: yfinance
 Requires-Dist: statsmodels
 Requires-Dist: streamlit
+Requires-Dist: db-dtypes
+Requires-Dist: pandas-gbq
+Dynamic: author
+Dynamic: author-email
 Dynamic: requires-dist
 Dynamic: summary
