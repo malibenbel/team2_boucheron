@@ -25,7 +25,7 @@ eur_conversion:
 
 # Run the recommender (streamlit function).
 streamlit:
-	python -c "from luxury_project.interface.main import streamlit; streamlit()"
+	python -m streamlit run luxury_project/ml_logic/boucheron_recommender.py
 
 # Run the ARIMA forecast test.
 train_test:

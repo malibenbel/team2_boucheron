@@ -17,9 +17,10 @@ def data_loading():
     df_price = load_data(
         "SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.Price`"
     )
+    df_recom = load_data("SELECT * FROM `still-dynamics-451213-b9.Price_Monitoring.recom`")
     df_price["price"] = pd.to_numeric(df_price["price"], errors="coerce")
     df_stock = get_stock_data()
-    return df_sales, df_price, df_stock
+    return df_sales, df_price, df_stock, df_recom
 
 
 def scraping():
@@ -57,13 +58,14 @@ def eur_conversion(df_sales, df_price):
     return df_sales, df_price
 
 
-def streamlit():
+def streamlit(df_recom):
     """
     Run the Boucheron recommender.
     """
     print("Starting recommender (training step)...")
-    boucheron_recommender()
+    boucheron_recommender(df_recom)
     print("Training complete.")
+    return df_recom
 
 
 def train_test():
@@ -105,7 +107,7 @@ def main():
         df_sales, df_price, df_scraped, df_stock
     )
     df_sales, df_price = eur_conversion(df_sales, df_price)
-    streamlit()
+    df_recom = streamlit(df_recom)
     train_test()
 
 
