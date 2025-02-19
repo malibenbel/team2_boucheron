@@ -10,3 +10,5 @@ def get_stock_data(ticker_symbol="KER.PA"):
     data.set_index("Date", inplace=True)
     data.index = pd.to_datetime(data.index)
     return data
+
+
