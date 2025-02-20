@@ -5,7 +5,7 @@
 Our luxury consulting engineering team stores historical product data in a massive BigQuery table: `edhec-business-manageme.luxurydata2502.price-monitoring-2022`, which contains over 2 million rows (limited from 5+ million for cost control). This data, extracted from a 2023 company study, was used to perform a strategic business analysis. In our case, we analyzed the evolution of the luxury brand Boucheron, exploring pricing trends, exchange rates, market dynamics, and other useful information.
 
 
-## Functions Overview
+## Functions
 
 - **data_loading()**: Loads sales, price, and stock data from BigQuery and Yahoo Finance.
 - **scraping()**: Runs the web scraper to fetch extra product data.
